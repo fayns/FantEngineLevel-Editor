@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Level</title>
+</head>
+<body>
+  <h1>Game Window</h1>
+  <button onclick="runGame()">Run Game</button>
+
+  <script>
+    function runGame() {
+      // Открываем новое окно для запуска игры
+      const gameWindow = window.open('visual_programming.html', '_blank', 'width=800,height=600');
+
+      // Если у вас есть специфичные логики для запуска, вы можете вызывать функции в новом окне.
+      // Например, вызовем функцию playGame() в новом окне.
+      if (gameWindow) {
+        gameWindow.onload = function() {
+          gameWindow.playGame();
+        };
+      } else {
+        console.error('Failed to open the game window.');
+      }
+    }
+  </script>
+</body>
+</html>

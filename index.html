@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FantEngineLevel - Editor</title>
+  <link rel="stylesheet" href="Главная.css" media="screen">
+  <link rel="stylesheet" href="nicepage.css" media="screen">
+  <meta name="generator" content="Nicepage 6.2.1, nicepage.com">
+    <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
+  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      background-color: #414141;
+    }
+    #rightPanel {
+    flex: 0 0 14%; /* Измените это значение по вашему усмотрению */
+    display: flex;
+    flex-direction: column;
+    background-color: #1a1a1a;
+    color: #fff;
+    padding: 10px;
+    z-index: 0;
+}
+
+        .right-tool-button {
+            display: block;
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+        }
+        .right-tool-button:hover {
+            background-color: #555;
+        }
+
+
+    #colorInterface {
+      display: flex;
+      flex-direction: column;
+      background-color: #1a1a1a;
+      color: #fff;
+      padding: 10px;
+      width: 9%;
+      z-index: 0;
+    }
+
+    #interface {
+      display: flex;
+      flex-direction: column;
+      width: 5%;
+      height: 2000px;
+      background-color: #1a1a1a;
+      color: #fff;
+      padding: 5px;
+      z-index: 1;
+    }
+
+    .tool-play {
+      display: block;
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #66ff00;
+      color: #fff;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      border-radius: 5px;
+      border-right-width: 0;
+      border-right-style: none;
+    }
+
+    .tool-button {
+      display: block;
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      border-radius: 5px;
+      border-right-width: 0;
+      border-right-style: none;
+    }
+
+    .tool-button:hover {
+      background-color: #555;
+    }
+
+    .textSize {
+      display: block;
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      border-radius: 5px;
+    }
+
+    .tool-color {
+      display: block;
+      width: 90%;
+      margin-bottom: 10px;
+      background-color: #333;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      border-radius: 5px;
+    }
+
+    .textEditor {
+      display: block;
+      width: 60%;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      border-radius: 5px;
+    }
+
+    .tool-input {
+      display: block;
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      border-radius: 5px;
+    }
+
+  #parent {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  height: 30px;
+}
+
+.elem {
+  width: 25px;
+  height: 25px;
+  border: 1px solid rgb(255, 255, 255);
+  display: inline-block;
+}
+#canvas-container {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    #gameCanvas {
+      border: 4px solid #ff0000;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    #textOptions {
+      margin-top: 10px;
+    }
+
+    #textOptions input,
+    #textOptions textarea {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="interface">
+    <button class="tool-play" onclick="startGame()"><img src="./images/FEL/run_map.png"></button>
+    <div>
+    <button class="tool-button" onclick="selectTool('move')"><img src="./images/FEL/move_tool_icon_activated.png"></button>
+    </div>
+    <button class="tool-button" onclick="selectTool('resize')"><img src="./images/FEL/scale_tool_icon_activated.png"></button>
+    <button class="tool-button" onclick="selectTool('rotate')"><img src="./images/FEL/rotate_tool_icon_activated.png"></button>
+    <button class="tool-button" onclick="addObject()"><img src="./images/FEL/add.png"></button>
+    <button class="tool-button" onclick="duplicateObject()"><img src="./images/FEL/duplicate.png"></button>
+    <button class="tool-button" onclick="addText()"><img src="./images/FEL/tile_editor_enable_disable_activated.png"></button>
+    <button class="tool-button" onclick="removeObject()"><img src="./images/FEL/delete.png"></button>
+    <button class="tool-button" onclick="toggleGrid()"><img src="./images/FEL/setka.png"></button>
+  </div>
+    <div id="canvas-container" style="background-image: url('./path/to/default/background.jpg');">
+      <div id="parent">
+      <canvas id="gameCanvas" width="1100" height="673" onmousedown="handleCanvasMouseDown(event)"
+        onmousemove="handleCanvasMouseMove(event)" onmouseup="handleCanvasMouseUp()">
+      </div>
+      </canvas>
+      </div>
+      <div id="rightPanel">
+        <h4>Object Editor</h4>
+        <input class="tool-color" type="color" id="colorPicker" value="#00ff00" onchange="changeColor()">
+        <h4>Text Editor</h4>
+        <input class="tool-color" type="color" id="textColorPicker" value="#ffffff" onchange="changeTextColor()">
+        <textarea class="tool-button" id="textEditor" placeholder="Enter text here" oninput="updateText()"></textarea>
+        <input class="textSize" type="number" id="textSizeInput" placeholder="Text Size" oninput="updateTextSize()">
+        <h4>Scene Editor</h4>
+        <input class="tool-input" type="file" id="fileInput" onchange="loadImageBackground(this)">
+        <input class="tool-input" type="file" id="fileInput" onchange="loadSceneFromFile(this)">
+        <button class="tool-button" onclick="saveSceneToFile()"><img src="./images/FEL/save_all.png">Save Scene</button>
+    </div>
+    <div id="blocklyDiv" style="height: 100vh;"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script>
+        // Ваш скрипт с добавлением возможности включения/выключения сетки
+        var showGrid = false;
+ //Высота
+for (var i = 0; i < 22; i++) {
+  var row = createRow();
+  // Ширина
+  for (var k = 0; k < 60; k++) {
+    createElement(row);
+  }
+}
+
+function createRow() {
+  var parent = document.getElementById('parent');
+  var row = document.createElement('div');
+  row.className = 'row';
+  parent.appendChild(row);
+  return row;
+}
+
+function createElement(parent) {
+  var elem = document.createElement('div');
+  elem.className = 'elem';
+  elem.style.border = showGrid ? '1px solid white' : 'none';
+  parent.appendChild(elem);
+}
+
+function toggleGrid() {
+  showGrid = !showGrid;
+  updateGrid();
+}
+
+function updateGrid() {
+  var elems = document.getElementsByClassName('elem');
+  for (var i = 0; i < elems.length; i++) {
+    elems[i].style.border = showGrid ? '1px solid white' : 'none';
+  }
+}
+    class Scene {
+      constructor() {
+        this.objects = [];
+      }
+
+      addObject(object) {
+        this.objects.push(object);
+      }
+
+      removeObject(object) {
+        const index = this.objects.indexOf(object);
+        if (index !== -1) {
+          this.objects.splice(index, 1);
+        }
+      }
+    }
+    let prevRotationAngle = 0;
+
+    class GameObject {
+      constructor(x, y, width, height, material, textColor, text, textSize) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.material = material;
+        this.text = text || "";
+        this.textColor = textColor;
+        this.textSize = textSize || 16;
+        this.isSelected = false;
+        this.isDragging = false;
+        this.dragOffsetX = 0;
+        this.dragOffsetY = 0;
+        this.isResizing = false;
+        this.resizingHandle = null;
+        this.rotationAngle = 0;
+        this.rotationCenter = { x: x + width / 2, y: y + height / 2 }; // Центр 
+        this.isRotating = false;  // Новая строка вращения
+      }
+    }
+
+    let currentTool = 'move';
+    let selectedObject = null;
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scene = new Scene();
+    const colorPicker = document.getElementById('colorPicker');
+    const textColorPicker = document.getElementById('textColorPicker');
+    const textEditor = document.getElementById('textEditor');
+    const textSizeInput = document.getElementById('textSizeInput');
+    
+
+    function selectTool(tool) {
+      currentTool = tool;
+    }
+
+    function addObject() {
+      const newObject = new GameObject(canvas.width / 2 - 25, canvas.height / 2 - 25, 50, 50, colorPicker.value, textColorPicker.value);
+      scene.addObject(newObject);
+      drawScene();
+    }
+
+    function addText() {
+      const newTextObject = new GameObject(canvas.width / 2, canvas.height / 2, 100, 50, colorPicker.value, textColorPicker.value, textEditor.value, parseInt(textSizeInput.value, 10));
+      scene.addObject(newTextObject);
+      drawScene();
+    }
+
+    function removeObject() {
+      if (selectedObject) {
+        scene.removeObject(selectedObject);
+        selectedObject = null;
+        drawScene();
+      }
+    }
+
+    function drawRotatedObject(obj, context) {
+      context.save();
+      context.translate(obj.x + obj.width / 2, obj.y + obj.height / 2);
+      context.rotate(obj.rotationAngle);
+      context.fillStyle = obj.material;
+      context.fillRect(-obj.width / 2, -obj.height / 2, obj.width, obj.height);
+      context.restore();
+
+      // Отображаем угол вращения
+      context.fillStyle = 'white';
+      context.font = '12px Arial';
+      context.fillText(`Angle: ${obj.rotationAngle.toFixed(2)}`, obj.x, obj.y - 5);
+    }
+
+
+
+    function drawScene() {
+      const gameCanvas = document.getElementById('gameCanvas');
+      const ctx = gameCanvas.getContext('2d');
+      ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+      // Ваш код отрисовки объектов
+      scene.objects.forEach(obj => {
+        if (!obj.isRotating) {
+          if (obj.text !== "") {
+            ctx.font = obj.textSize + "px Arial";
+            ctx.fillStyle = obj.textColor;
+            ctx.fillText(obj.text, obj.x, obj.y + obj.height);
+          } else {
+            drawRotatedObject(obj, ctx);
+            if (obj.isSelected) {
+              ctx.strokeStyle = 'red';
+              ctx.lineWidth = 2;
+              ctx.strokeRect(obj.x, obj.y, obj.width, obj.height);
+            }
+          }
+        }
+      });
+
+      
+    }
+
+    function handleCanvasMouseDown(event) {
+      const mouseX = event.clientX - canvas.getBoundingClientRect().left;
+      const mouseY = event.clientY - canvas.getBoundingClientRect().top;
+
+      for (let i = scene.objects.length - 1; i >= 0; i--) {
+        const obj = scene.objects[i];
+        if (
+          mouseX >= obj.x &&
+          mouseX <= obj.x + obj.width &&
+          mouseY >= obj.y &&
+          mouseY <= obj.y + obj.height
+        ) {
+          selectedObject = obj;
+          obj.isSelected = true;
+
+          if (currentTool === 'move') {
+            obj.isDragging = true;
+            obj.dragOffsetX = mouseX - obj.x;
+            obj.dragOffsetY = mouseY - obj.y;
+          } else if (currentTool === 'resize') {
+            obj.isDragging = false;
+            obj.isResizing = true;
+          }
+
+          drawScene();
+          break;
+        }
+      }
+    }
+
+    function handleCanvasMouseMove(event) {
+      const mouseX = event.clientX - canvas.getBoundingClientRect().left;
+      const mouseY = event.clientY - canvas.getBoundingClientRect().top;
+
+      if (selectedObject && selectedObject.isSelected) {
+        if (currentTool === 'move' && selectedObject.isDragging) {
+          selectedObject.x = mouseX - selectedObject.dragOffsetX;
+          selectedObject.y = mouseY - selectedObject.dragOffsetY;
+          drawScene();
+        } else if (currentTool === 'resize' && selectedObject.isResizing) {
+          selectedObject.width = Math.max(mouseX - selectedObject.x, 10);
+          selectedObject.height = Math.max(mouseY - selectedObject.y, 10);
+          drawScene();
+        } else if (currentTool === 'rotate' && selectedObject.isRotating) {
+          rotateObject(event);
+        }
+      }
+    }
+    function duplicateObject() {
+  if (selectedObject) {
+    const duplicatedObject = new GameObject(
+      selectedObject.x + 10, // или другое смещение по вашему усмотрению
+      selectedObject.y + 10,
+      selectedObject.width,
+      selectedObject.height,
+      selectedObject.material,
+      selectedObject.textColor,
+      selectedObject.text,
+      selectedObject.textSize
+    );
+
+    scene.addObject(duplicatedObject);
+    selectedObject.isSelected = false;
+    selectedObject = duplicatedObject;
+
+    drawScene();
+  }
+}
+
+
+    function handleCanvasMouseUp() {
+      if (selectedObject) {
+        selectedObject.isDragging = false;
+        selectedObject.isResizing = false;
+      }
+    }
+
+    function changeColor() {
+      if (selectedObject) {
+        selectedObject.material = colorPicker.value;
+        drawScene();
+      }
+    }
+
+    function changeTextColor() {
+      if (selectedObject && selectedObject.text !== "") {
+        selectedObject.textColor = textColorPicker.value;
+        drawScene();
+      }
+    }
+
+    function updateText() {
+      if (selectedObject && selectedObject.text !== "") {
+        selectedObject.text = textEditor.value;
+        drawScene();
+      }
+    }
+
+    function updateTextSize() {
+      if (selectedObject && selectedObject.text !== "") {
+        selectedObject.textSize = parseInt(textSizeInput.value, 10);
+        drawScene();
+      }
+    }
+let rotationStarted = false;
+
+function startRotation(event) {
+  if (selectedObject && currentTool === 'rotate') {
+    rotationStarted = true;
+    selectedObject.isRotating = true;
+    const centerX = selectedObject.x + selectedObject.width / 2;
+    const centerY = selectedObject.y + selectedObject.height / 2;
+    selectedObject.rotationCenter = { x: centerX, y: centerY };
+  }
+}
+
+function rotateObject(event) {
+  if (selectedObject && currentTool === 'rotate' && rotationStarted) {
+    const mouseX = event.clientX - canvas.getBoundingClientRect().left;
+    const mouseY = event.clientY - canvas.getBoundingClientRect().top;
+
+    const angle = Math.atan2(mouseY - selectedObject.rotationCenter.y, mouseX - selectedObject.rotationCenter.x);
+    selectedObject.rotationAngle = angle;
+
+    const prevX = selectedObject.x;
+    const prevY = selectedObject.y;
+
+    const rotatedCenter = rotatePoint(prevX + selectedObject.width / 2, prevY + selectedObject.height / 2, selectedObject.rotationCenter.x, selectedObject.rotationCenter.y, angle);
+    selectedObject.rotationCenter.x = rotatedCenter.x;
+    selectedObject.rotationCenter.y = rotatedCenter.y;
+
+    const rotatedTopLeft = rotatePoint(prevX, prevY, selectedObject.rotationCenter.x, selectedObject.rotationCenter.y, angle);
+    selectedObject.x = rotatedTopLeft.x;
+    selectedObject.y = rotatedTopLeft.y;
+
+    drawScene();
+  }
+}
+
+
+function endRotation() {
+  rotationStarted = false;
+  if (selectedObject) {
+    selectedObject.rotationCenter = null;
+    selectedObject.isRotating = false;
+    prevRotationAngle = selectedObject.rotationAngle; // Сохраняем текущий угол как предыдущий
+    drawScene();
+  }
+}
+
+
+canvas.addEventListener('mousedown', handleCanvasMouseDown);
+canvas.addEventListener('mousemove', handleCanvasMouseMove);
+canvas.addEventListener('mouseup', handleCanvasMouseUp);
+canvas.addEventListener('mousedown', startRotation);
+document.addEventListener('mousemove', rotateObject);
+document.addEventListener('mouseup', endRotation);
+
+    addObject();
+    document.getElementById('canvas-container').addEventListener('wheel', function(event) {
+      const delta = event.deltaY;
+      const canvasContainer = document.getElementById('canvas-container');
+      canvasContainer.scrollTop += delta;
+      event.preventDefault();
+    });
+    
+function loadSceneFromFile(input) {
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const sceneData = JSON.parse(e.target.result);
+
+        // Здесь вы должны обновить сцену или выполнить какие-то действия с полученными данными
+        // Например, можно очистить текущую сцену и добавить объекты из загруженных данных
+        scene.objects = [];
+        sceneData.objects.forEach(objData => {
+          const newObj = new GameObject(objData.x, objData.y, objData.width, objData.height, objData.material, objData.textColor, objData.text, objData.textSize);
+          newObj.rotationAngle = objData.rotationAngle || 0; // Установите угол вращения из загруженных данных или 0, если данных нет
+          scene.addObject(newObj);
+        });
+
+        drawScene();  // Обновите отображение после загрузки сцены
+      };
+
+      reader.readAsText(file);
+    }
+ // Инициализация Blockly
+ var workspace = Blockly.inject('blocklyDiv',
+      {toolbox: Blockly.Blocks['logic'].toolbox});
+
+    // Обработка сохранения сцены
+    function saveScene() {
+      var xml = Blockly.Xml.workspaceToDom(workspace);
+      var xmlText = Blockly.Xml.domToText(xml);
+      // Отправка xmlText на сервер или сохранение локально
+    }
+
+    // Обработка загрузки сцены
+    function loadScene(xmlText) {
+      var xml = Blockly.Xml.textToDom(xmlText);
+      Blockly.Xml.domToWorkspace(xml, workspace);
+      // Восстановление объектов и других данных сцены
+    }
+    function openVisualProgramming() {
+    window.open('visual_programming.html');
+  }
+  function openVisualProgrammingWithTextBlock() {
+    var textBlockXml =
+      '<xml xmlns="http://www.w3.org/1999/xhtml">' +
+        '<block type="output_text">' +
+          '<value name="TEXT">' +
+            '<shadow type="text">' +
+              '<field name="TEXT">Hello, World!</field>' +
+            '</shadow>' +
+          '</value>' +
+        '</block>' +
+      '</xml>';
+    var url = 'visual_programming.html#' + encodeURIComponent(textBlockXml);
+    window.open(url);
+  }
+  function startGame() {
+    window.open('Game_Level.html');
+}
+const { ipcRenderer } = require('electron');
+
+    // Обработчик сообщения от главного процесса
+    ipcRenderer.on('saveSceneToFileReply', (event, arg) => {
+  console.error(arg); // Вывод сообщения в консоль
+  saveSceneToFile();
+    });
+    function TestGame() {
+    window.open('./Test.html');
+}
+function loadImageBackground(input) {
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const imageURL = e.target.result;
+        document.getElementById('canvas-container').style.backgroundImage = `url(${imageURL})`;
+      };
+
+      reader.readAsDataURL(file);
+    }
+    function saveSceneToFile() {
+  const serializedScene = JSON.stringify(scene);
+  const blob = new Blob([serializedScene], { type: 'application/json' });
+  
+  // Создаем ссылку для скачивания файла
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  
+  // Задаем имя файла
+  link.download = 'scene.json';
+
+  // Добавляем ссылку на страницу и эмулируем клик для запуска скачивания
+  document.body.appendChild(link);
+  link.click();
+
+  // Удаляем ссылку после завершения скачивания
+  document.body.removeChild(link);
+  ipcRenderer.send('saveSceneToFile');
+}
+</script>
+</body>
+</html>

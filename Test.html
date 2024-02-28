@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+ <head>
+   <meta charset = "utf-8">
+   <title>JavaScript game</title>
+   <style>
+  #parent {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  height: 27px;
+}
+
+.elem {
+  width: 25px;
+  height: 25px;
+  border: 1px solid green;
+  display: inline-block;
+}
+#canvas-container {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #gameCanvas {
+      border: 3px solid #000;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+   </style>
+ </head>
+ <body>
+    <button onclick="toggleGrid()">Toggle Grid</button>
+    <div id="canvas-container">
+        <div id="parent">
+        <canvas id="gameCanvas" width="1210" height="673" onmousedown="handleCanvasMouseDown(event)"
+          onmousemove="handleCanvasMouseMove(event)" onmouseup="handleCanvasMouseUp()">
+        </div>
+        </canvas>
+        </div>
+   <script>
+    var showGrid = false;
+    //Высота
+    for (var i = 0; i < 27; i++) {
+        var row = createRow();
+        // Ширина
+        for (var k = 0; k < 45; k++) {
+          createElement(row);
+        }
+      }
+
+      function createRow() {
+        var parent = document.getElementById('parent');
+        var row = document.createElement('div');
+        row.className = 'row';
+        parent.appendChild(row);
+        return row;
+      }
+
+      function createElement(parent) {
+        var elem = document.createElement('div');
+        elem.className = 'elem';
+        elem.style.border = showGrid ? '1px solid green' : 'none';
+        parent.appendChild(elem);
+      }
+
+      function toggleGrid() {
+        showGrid = !showGrid;
+        updateGrid();
+      }
+
+      function updateGrid() {
+        var elems = document.getElementsByClassName('elem');
+        for (var i = 0; i < elems.length; i++) {
+          elems[i].style.border = showGrid ? '1px solid green' : 'none';
+        }
+      }
+
+    
+   </script>
+     </body>
+    </html>

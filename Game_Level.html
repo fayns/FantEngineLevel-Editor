@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Level</title>
+</head>
+<style>
+  body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      background-color: #414141;
+    }
+</style>
+<body>
+  <input class="tool-input" type="file" id="fileInput" onchange="loadSceneFromFile(this)">
+  <div id="canvas-container">
+    <canvas id="gameCanvas" width="900" height="700" onmousedown="handleCanvasMouseDown(event)" onmousemove="handleCanvasMouseMove(event)" onmouseup="handleCanvasMouseUp()"></canvas>
+  </div>
+  <script>
+    class Scene {
+      constructor() {
+        this.objects = [];
+      }
+
+      addObject(object) {
+        this.objects.push(object);
+      }
+
+      removeObject(object) {
+        const index = this.objects.indexOf(object);
+        if (index !== -1) {
+          this.objects.splice(index, 1);
+        }
+      }
+    }
+
+    class GameObject {
+      constructor(x, y, width, height, material, textColor, text, textSize) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.material = material;
+        this.text = text || "";
+        this.textColor = textColor;
+        this.textSize = textSize || 16;
+        this.isSelected = false;
+        this.isDragging = false;
+        this.dragOffsetX = 0;
+        this.dragOffsetY = 0;
+        this.isResizing = false;
+        this.resizingHandle = null;
+        this.rotationAngle = 0;
+        this.rotationCenter = { x: x + width / 2, y: y + height / 2 };
+        this.isRotating = false;
+      }
+    }
+
+    let currentTool = 'move';
+    let selectedObject = null;
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scene = new Scene();
+
+    function drawRotatedObject(obj, context) {
+      context.save();
+      context.translate(obj.x + obj.width / 2, obj.y + obj.height / 2);
+      context.rotate(obj.rotationAngle);
+      context.fillStyle = obj.material;
+      context.fillRect(-obj.width / 2, -obj.height / 2, obj.width, obj.height);
+      context.restore();
+
+      // Отображаем угол вращения
+      context.fillStyle = 'white';
+      context.font = '12px Arial';
+      context.fillText(`Angle: ${obj.rotationAngle.toFixed(2)}`, obj.x, obj.y - 5);
+    }
+
+    function drawScene() {
+      const gameCanvas = document.getElementById('gameCanvas');
+      const ctx = gameCanvas.getContext('2d');
+      ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+      // Ваш код отрисовки объектов
+      scene.objects.forEach(obj => {
+        if (!obj.isRotating) {
+          if (obj.text !== "") {
+            ctx.font = obj.textSize + "px Arial";
+            ctx.fillStyle = obj.textColor;
+            ctx.fillText(obj.text, obj.x, obj.y + obj.height);
+          } else {
+            drawRotatedObject(obj, ctx);
+            if (obj.isSelected) {
+              ctx.strokeStyle = 'red';
+              ctx.lineWidth = 2;
+              ctx.strokeRect(obj.x, obj.y, obj.width, obj.height);
+            }
+          }
+        }
+      });
+    }
+
+    function loadSceneFromFile(input) {
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const sceneData = JSON.parse(e.target.result);
+
+        // Здесь вы должны обновить сцену или выполнить какие-то действия с полученными данными
+        // Например, можно очистить текущую сцену и добавить объекты из загруженных данных
+        scene.objects = [];
+        sceneData.objects.forEach(objData => {
+          const newObj = new GameObject(objData.x, objData.y, objData.width, objData.height, objData.material, objData.textColor, objData.text, objData.textSize);
+          newObj.rotationAngle = objData.rotationAngle || 0; // Установите угол вращения из загруженных данных или 0, если данных нет
+          scene.addObject(newObj);
+        });
+
+        drawScene();  // Обновите отображение после загрузки сцены
+      };
+
+      reader.readAsText(file);
+    }
+  </script>
+</body>
+</html>
